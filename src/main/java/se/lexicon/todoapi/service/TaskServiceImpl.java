@@ -5,35 +5,28 @@ import org.springframework.stereotype.Service;
 import se.lexicon.todoapi.converter.TaskConverter;
 import se.lexicon.todoapi.domain.dto.TaskDTOForm;
 import se.lexicon.todoapi.domain.dto.TaskDTOView;
-import se.lexicon.todoapi.domain.entity.Person;
 import se.lexicon.todoapi.domain.entity.Task;
 import se.lexicon.todoapi.repository.PersonRepository;
 import se.lexicon.todoapi.repository.TaskRepository;
-import se.lexicon.todoapi.repository.UserRepository;
 
-import java.time.LocalDate;
 
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class TaskServiceImpl implements TaskService {
 
-    private TaskConverter taskConverter;
-    private TaskRepository taskRepository;
-    private PersonRepository personRepository;
-    private UserRepository userRepository;
+    private final TaskConverter taskConverter;
+    private final TaskRepository taskRepository;
+    private final PersonRepository personRepository;
 
     @Autowired
     public TaskServiceImpl(TaskConverter taskConverter,
                            TaskRepository taskRepository,
-                           PersonRepository personRepository,
-                           UserRepository userRepository) {
+                           PersonRepository personRepository)
+    {
         this.taskConverter = taskConverter;
         this.taskRepository = taskRepository;
         this.personRepository = personRepository;
-        this.userRepository = userRepository;
     }
 
     public TaskDTOView saveTask(TaskDTOForm taskDTOForm, Long id) {
@@ -64,7 +57,7 @@ public class TaskServiceImpl implements TaskService {
         }
 
         return allTasks.stream()
-                .map(task -> taskConverter.toTaskDTOView(task))
+                .map(taskConverter::toTaskDTOView)
                 .toList();
     }
 }
