@@ -2,7 +2,6 @@ package se.lexicon.todoapi.service;
 
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import se.lexicon.todoapi.converter.UserConverter;
@@ -13,6 +12,8 @@ import se.lexicon.todoapi.domain.entity.User;
 import se.lexicon.todoapi.exception.DataNotFoundException;
 import se.lexicon.todoapi.repository.RoleRepository;
 import se.lexicon.todoapi.repository.UserRepository;
+
+
 
 import java.util.List;
 import java.util.Set;
@@ -25,24 +26,29 @@ public class UserServiceImpl implements UserService {
     private final RoleRepository roleRepository;
     private PasswordEncoder passwordEncoder;
     private UserConverter userConverter;
+    private se.lexicon.g46emailsenderapi.service.EmailService emailService;
+
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository,
                            RoleRepository roleRepository,
                            PasswordEncoder passwordEncoder,
-                           UserConverter userConverter) {
+                           UserConverter userConverter,
+                           EmailService emailService) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
         this.userConverter = userConverter;
+        this.emailService  emailService;
     }
+
 
     @Override
     public UserDTOView register(UserDTOForm userDTOForm) { // test.test@.se , 123456 , [ADMIN,USER])
         if (userDTOForm == null) throw new IllegalArgumentException("User form is null.");
 
         boolean isExistEmail = userRepository.existsByEmail(userDTOForm.getEmail());
-        if (isExistEmail) throw new IllegalArgumentException("Email is already exist");
+        if (isExistEmail) throw new IllegalArgumentException("Email already exist");
 
         Set<Role> roleList = userDTOForm.getRoles()
                 .stream()
@@ -54,8 +60,11 @@ public class UserServiceImpl implements UserService {
         User user = new User(userDTOForm.getEmail(), passwordEncoder.encode(userDTOForm.getPassword()));
         user.setRoles(roleList);
 
-        User savedUser = userRepository.save(user);
+        EmailDTOForm email = new EmailDTOForm();
 
+        emailService.sendEmail(email);
+
+        User savedUser = userRepository.save(user);
         return userConverter.toUserDTOView(savedUser);
     }
 

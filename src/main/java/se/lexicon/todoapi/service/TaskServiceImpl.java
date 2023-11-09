@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import se.lexicon.todoapi.converter.TaskConverter;
 import se.lexicon.todoapi.domain.dto.TaskDTOForm;
 import se.lexicon.todoapi.domain.dto.TaskDTOView;
+import se.lexicon.todoapi.domain.entity.Person;
 import se.lexicon.todoapi.domain.entity.Task;
 import se.lexicon.todoapi.repository.PersonRepository;
 import se.lexicon.todoapi.repository.TaskRepository;
@@ -33,8 +34,11 @@ public class TaskServiceImpl implements TaskService {
         if (taskDTOForm == null) throw new IllegalArgumentException("Task form is null.");
 
         Task task = new Task(taskDTOForm.getTitle(), taskDTOForm.getDescription(), taskDTOForm.getDeadline(), taskDTOForm.isDone());
-        System.out.println(personRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("No person found with id: " + id)));
-        personRepository.findById(id).ifPresent(task::setPerson);
+
+//        System.out.println(personRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("No person found with id: " + id)));
+
+        Person person = personRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("No person found with id: " + id));
+        task.setPerson(person);
 
         Task savedTask;
         try {
