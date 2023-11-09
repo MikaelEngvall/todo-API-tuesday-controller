@@ -25,6 +25,8 @@
             <groupId>se.lexicon</groupId>
             <artifactId>g46-email-sender-api</artifactId>
             <version>0.0.1-SNAPSHOT</version>
+            <scope>system</scope>
+            <systemPath>c:/Users/deltagare/IdeaProjects/libs/g46-email-sender-api.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

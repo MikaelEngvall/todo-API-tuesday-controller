@@ -4,6 +4,8 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import se.lexicon.g46emailsenderapi.domain.dto.EmailDTOForm;
+import se.lexicon.g46emailsenderapi.service.EmailService;
 import se.lexicon.todoapi.converter.UserConverter;
 import se.lexicon.todoapi.domain.dto.UserDTOForm;
 import se.lexicon.todoapi.domain.dto.UserDTOView;
@@ -12,6 +14,8 @@ import se.lexicon.todoapi.domain.entity.User;
 import se.lexicon.todoapi.exception.DataNotFoundException;
 import se.lexicon.todoapi.repository.RoleRepository;
 import se.lexicon.todoapi.repository.UserRepository;
+
+
 
 
 
@@ -26,7 +30,7 @@ public class UserServiceImpl implements UserService {
     private final RoleRepository roleRepository;
     private PasswordEncoder passwordEncoder;
     private UserConverter userConverter;
-    private se.lexicon.g46emailsenderapi.service.EmailService emailService;
+    private EmailService emailService;
 
 
     @Autowired
@@ -34,12 +38,14 @@ public class UserServiceImpl implements UserService {
                            RoleRepository roleRepository,
                            PasswordEncoder passwordEncoder,
                            UserConverter userConverter,
-                           EmailService emailService) {
+                           EmailService emailService)
+                           {
+
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
         this.userConverter = userConverter;
-        this.emailService  emailService;
+        this.emailService = emailService;
     }
 
 
@@ -60,8 +66,8 @@ public class UserServiceImpl implements UserService {
         User user = new User(userDTOForm.getEmail(), passwordEncoder.encode(userDTOForm.getPassword()));
         user.setRoles(roleList);
 
-        EmailDTOForm email = new EmailDTOForm();
-
+//        Create an email for the new user as a confirmation
+        EmailDTOForm email = new EmailDTOForm(userDTOForm.getEmail(), "Registration", "<H1> Try this out </H1>", 1);
         emailService.sendEmail(email);
 
         User savedUser = userRepository.save(user);
